@@ -1,0 +1,13 @@
+.dockerignore
+.dev.env
+.env
+.gitignore
+Dockerfile
+README.md
+.venv
+.github
+*logs/**
+*records/**
+__pycache__
+*.pyc
+.idea/**

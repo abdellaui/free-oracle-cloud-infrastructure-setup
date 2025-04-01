@@ -1,0 +1,13 @@
+[Unit]
+Description=Cloudflare DNS Record Update Service
+After=network.target
+
+[Service]
+ExecStart=/bin/bash -c 'source ${APP_SRC_PATH}/.env && ${APP_SRC_PATH}/cloud-init.sh "cloudflare-auto"'
+Restart=on-failure
+RestartSec=5s
+User=${USER_NAME}
+Group=${USER_NAME}
+
+[Install]
+WantedBy=multi-user.target

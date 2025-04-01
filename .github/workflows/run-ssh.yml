@@ -1,0 +1,95 @@
+name: Run Bash Script via SSH
+on:
+  workflow_dispatch:  # This allows manual triggering
+#   push:
+#     branches:
+#       - main
+#   pull_request:
+#     branches:
+#       - main
+concurrency:
+  group: main-branch
+  cancel-in-progress: false
+
+jobs:
+  run-bash-script:
+    runs-on:
+      - self-hosted
+      - df
+    environment: CI-CD
+    env:
+      PROJECT_NAME: "demo-service"
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v3
+
+      - name: Set up SSH key
+        uses: webfactory/ssh-agent@v0.9.0
+        with:
+          ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}
+
+      - name: Create ./transfer.env file from ./src/templates/.env.template
+        env:
+          REPLACE_SECRET_SSH_USER: ${{ secrets.SSH_USER }}
+          REPLACE_SECRET_SSH_HOST: ${{ secrets.SSH_HOST }}
+          REPLACE_SECRET_PUBLIC_HOST: ${{ secrets.PUBLIC_HOST }}
+          REPLACE_SECRET_CLOUDFLARE_API_KEY: ${{ secrets.CLOUDFLARE_API_KEY }}
+          REPLACE_SECRET_CLOUDFLARE_ZONE_ID: ${{ secrets.CLOUDFLARE_ZONE_ID }}
+          REPLACE_SECRET_CLOUDFLARE_RECORD_ID: ${{ secrets.CLOUDFLARE_RECORD_ID }}
+          REPLACE_SECRET_COCKPIT_PASSWORD: ${{ secrets.COCKPIT_PASSWORD }}
+          REPLACE_SECRET_GITHUB_USER: ${{ secrets.P_GITHUB_USER }}
+          REPLACE_SECRET_GITHUB_TOKEN: ${{ secrets.P_GITHUB_TOKEN }}
+          REPLACE_SECRET_GITHUB_CLIENT_ID: ${{ secrets.P_GITHUB_CLIENT_ID }}
+          REPLACE_SECRET_GITHUB_CLIENT_SECRET: ${{ secrets.P_GITHUB_CLIENT_SECRET }}
+          REPLACE_SECRET_GITHUB_COOKIE_SECRET: ${{ secrets.P_GITHUB_COOKIE_SECRET }}
+          REPLACE_SECRET_MY_EMAIL_ADDRESS: ${{ secrets.MY_EMAIL_ADDRESS }}
+          REPLACE_SECRET_MY_OAUTH_EMAIL_HOST: ${{ secrets.MY_OAUTH_EMAIL_HOST}}
+        run: |
+          echo "Creating ./transfer.env file from ./src/templates/.env.template"
+          
+          # Dynamically get all environment variables starting with REPLACE_SECRET_
+          REPLACE_VARS=$(env | grep '^REPLACE_SECRET_' | awk -F= '{print "$"$1}' | tr '\n' ' ')
+          
+          echo "REPLACE_VARS: ${REPLACE_VARS}"
+          
+          # Use envsubst with dynamically generated variables
+          envsubst "$REPLACE_VARS" < ./src/templates/.env.template > ./transfer.env
+          
+          echo "Created ./transfer.env file"
+
+      - name: Copying everything to remote server via rsync
+        run: |
+          echo "Copying everthing to remote server"
+          rsync -avz \
+            --include "transfer.env" \
+            --include "requirements.txt" \
+            --include "src/***" \
+            --exclude "*" \
+            -e "ssh -o StrictHostKeyChecking=no" \
+            ./ ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }}:/home/${{ secrets.SSH_USER }}/${PROJECT_NAME}
+
+      - name: Run Bash Script on Remote Server
+        run: |
+          echo "############################################"
+          echo "############################################"
+          echo "########     RUN CLOUD INIT     ############"
+          echo "############################################"
+          echo "############################################"
+          cat ./src/cloud-init.sh | ssh -o StrictHostKeyChecking=no ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }} 'bash -s noop'
+  qodana:
+    runs-on: ubuntu-latest
+    continue-on-error: true
+    permissions:
+      contents: write
+      pull-requests: write
+      checks: write
+      security-events: write
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+          fetch-depth: 0
+      - name: "Qodana Scan"
+        uses: JetBrains/qodana-action@v2024.3
+        with:
+          upload-result: true

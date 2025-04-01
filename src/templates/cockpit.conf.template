@@ -1,0 +1,14 @@
+# Cockpit configuration
+[WebService]
+Origins=https://admin.${TLD_HOSTNAME}
+ProtocolHeader=X-Forwarded-Proto
+ForwardedForHeader=X-Forwarded-For
+LoginTo=false
+AllowMultiHost=false
+AllowUnencrypted=true
+
+[Log]
+Fatal=warnings
+
+[Session]
+IdleTimeout=15

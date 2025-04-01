@@ -1,0 +1,25 @@
+User-agent: *
+Disallow: /assets/*.mp4$
+
+User-agent: *
+Disallow: /assets/*.ovg$
+
+User-agent: *
+Disallow: /assets/*.webm$
+
+User-agent: *
+Disallow: /assets/*.mov$
+
+User-agent: *
+Disallow: /assets/*.psd$
+
+User-agent: *
+Disallow: /assets/*.otf$
+
+User-agent: *
+Disallow: /assets/*.ttf$
+
+User-agent: *
+Allow: /
+
+Sitemap: {{ host_url }}sitemap.xml

@@ -1,0 +1,21 @@
+[Unit]
+Description=[${APPLICATION_TIER} ${APPLICATION_SCRIPT}] ${PROJECT_NAME}
+After=network.target
+
+[Service]
+SyslogIdentifier=${PROJECT_NAME}
+StandardError=null
+StandardOutput=null
+WorkingDirectory=${APP_SRC_PATH}
+ExecStartPre=/bin/sleep ${APPLICATION_WAIT}
+ExecStart=${HOME_PATH}/python3.venv/bin/python -u ${APP_SRC_PATH}/app_${APPLICATION_SCRIPT}.py --app=${APPLICATION_SCRIPT} --tier=${APPLICATION_TIER} --wait=${APPLICATION_WAIT}
+Restart=always
+RestartSec=10s
+KillMode=mixed
+KillSignal=SIGTERM
+TimeoutStopSec=15s
+User=${USER_NAME}
+Group=${USER_NAME}
+
+[Install]
+WantedBy=multi-user.target

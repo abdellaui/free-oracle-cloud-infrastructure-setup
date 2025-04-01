@@ -1,0 +1,43 @@
+provider = "github"
+client_id = "${GITHUB_CLIENT_ID}"
+client_secret = "${GITHUB_CLIENT_SECRET}"
+
+email_domains = [ "${MY_OAUTH_EMAIL_HOST}" ]
+upstreams = [ "https://admin.${TLD_HOSTNAME}" ]
+redirect_url = "https://admin.${TLD_HOSTNAME}"
+reverse_proxy = true
+http_address = "127.0.0.1:4180"
+whitelist_domains = [ "admin.${TLD_HOSTNAME}" ]
+## Authenticated Email Addresses File (one email per line)
+# authenticated_emails_file = ""
+
+skip_provider_button = true
+ssl_upstream_insecure_skip_verify = true
+
+
+## Cookie Settings
+## Name     - the cookie name
+## Secret   - the seed string for secure cookies; should be 16, 24, or 32 bytes
+##            for use with an AES cipher when cookie_refresh or pass_access_token
+##            is set
+## Domain   - (optional) cookie domain to force cookies to (ie: .yourcompany.com)
+## Expire   - (duration) expire timeframe for cookie
+## Refresh  - (duration) refresh the cookie when duration has elapsed after cookie was initially set.
+##            Should be less than cookie_expire; set to 0 to disable.
+##            On refresh, OAuth token is re-validated.
+##            (ie: 1h means tokens are refreshed on request 1hr+ after it was set)
+## Secure   - secure cookies are only sent by the browser of a HTTPS connection (recommended)
+## HttpOnly - httponly cookies are not readable by javascript (recommended)
+
+cookie_name = "_oauth2_proxy"
+cookie_secret = "${GITHUB_COOKIE_SECRET}"
+cookie_domains = [ ".${TLD_HOSTNAME}" ]
+cookie_expire = "24h"
+cookie_refresh = "6h"
+cookie_secure = true
+cookie_httponly = true
+
+banner = "-"
+custom_sign_in_logo = "-"
+footer = "-"
+logging_filename = "/etc/oauth2-proxy/out.log"

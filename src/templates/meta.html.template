@@ -1,0 +1,11 @@
+<title>{{ app_service_title }}</title>
+<meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta http-equiv="content-language" content="en">
+<meta http-equiv="cache-control" content="cache">
+<meta name="robots" content="index, follow, noodp, noydir">
+<link rel="icon" type="image/png" sizes="64x64" href="{{ host_url }}{{ url_for('static', filename='favicon.png') }}">
+<link rel="icon" type="image/png" sizes="192x192" href="{{ host_url }}{{ url_for('static', filename='icon.png') }}">
+<link rel="apple-touch-icon" sizes="192x192" href="{{ host_url }}{{ url_for('static', filename='icon.png') }}">
+<link rev="made" href="mailto:info@{{ tld_host }}">
+<link rel="canonical" href="{{ host_url }}">

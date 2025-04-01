@@ -1,0 +1,217 @@
+server {
+    listen 80 default_server;
+    server_name ${TLD_HOSTNAME} www.${TLD_HOSTNAME};
+
+    location /assets/ {
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+        proxy_set_header X-Forwarded-Uri $request_uri;
+
+        proxy_pass http://127.0.0.1:9093/assets/;
+    }
+
+    location /sitemap.xml {
+        proxy_cache landing_cache;
+        proxy_cache_valid 200 12h;
+        proxy_cache_use_stale error timeout invalid_header updating http_500 http_502 http_503 http_504;
+        proxy_cache_key "landing-sitemap.xml";
+
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+        proxy_set_header X-Forwarded-Uri $request_uri;
+
+        proxy_pass http://127.0.0.1:9093/landing/sitemap.xml;
+    }
+
+    location /robots.txt {
+        proxy_cache landing_cache;
+        proxy_cache_valid 200 12h;
+        proxy_cache_use_stale error timeout invalid_header updating http_500 http_502 http_503 http_504;
+        proxy_cache_key "landing-robots.txt";
+
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+        proxy_set_header X-Forwarded-Uri $request_uri;
+
+        proxy_pass http://127.0.0.1:9093/landing/robots.txt;
+    }
+
+    location / {
+        proxy_cache landing_cache;
+        proxy_cache_valid 200 10m;
+        proxy_cache_use_stale error timeout invalid_header updating http_500 http_502 http_503 http_504;
+        proxy_cache_key "$host";
+
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+        proxy_set_header X-Forwarded-Uri $request_uri;
+
+        proxy_pass http://127.0.0.1:9093/landing/;
+    }
+}
+
+server {
+    listen 80;
+    server_name status.${TLD_HOSTNAME};
+
+    location /assets/ {
+        proxy_cache landing_cache;
+        proxy_cache_valid 200 12h;
+        proxy_cache_use_stale error timeout invalid_header updating http_500 http_502 http_503 http_504;
+        proxy_cache_key "$uri";
+
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+        proxy_set_header X-Forwarded-Uri $request_uri;
+
+        proxy_pass http://127.0.0.1:9093/assets/;
+    }
+
+    location /sitemap.xml {
+        proxy_cache landing_cache;
+        proxy_cache_valid 200 12h;
+        proxy_cache_use_stale error timeout invalid_header updating http_500 http_502 http_503 http_504;
+        proxy_cache_key "status-sitemap.xml";
+
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+        proxy_set_header X-Forwarded-Uri $request_uri;
+
+        proxy_pass http://127.0.0.1:9093/status/sitemap.xml;
+    }
+
+    location /robots.txt {
+        proxy_cache landing_cache;
+        proxy_cache_valid 200 12h;
+        proxy_cache_use_stale error timeout invalid_header updating http_500 http_502 http_503 http_504;
+        proxy_cache_key "status-robots.txt";
+
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+        proxy_set_header X-Forwarded-Uri $request_uri;
+
+        proxy_pass http://127.0.0.1:9093/status/robots.txt;
+    }
+
+    location / {
+        proxy_cache status_cache;
+        proxy_cache_valid 200 298s;
+        proxy_cache_use_stale error timeout invalid_header updating http_500 http_502 http_503 http_504;
+        proxy_cache_key "$host";
+        
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+        proxy_set_header X-Forwarded-Uri $request_uri;
+
+        proxy_pass http://127.0.0.1:9093/status/;
+    }
+}
+
+server {
+    listen 80;
+    server_name admin.${TLD_HOSTNAME};
+
+    # Gzip Compression
+    gzip on;
+    gzip_types text/plain text/css application/json application/javascript text/xml application/xml application/xml+rss text/javascript;
+    gzip_proxied any;
+    gzip_min_length 1000;
+
+    location /oauth2/ {
+        auth_request off;
+
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+        proxy_set_header X-Forwarded-Uri $request_uri;
+
+        proxy_pass http://127.0.0.1:4180/;
+    }
+
+    location /oauth2/sign_in {
+        auth_request off;
+
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+        proxy_set_header X-Forwarded-Uri $request_uri;
+
+        proxy_pass http://127.0.0.1:4180/oauth2/sign_in;
+    }
+
+    location /oauth2/callback {
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+        proxy_set_header X-Forwarded-Uri $request_uri;
+
+        proxy_pass http://127.0.0.1:4180/oauth2/callback;
+    }
+
+    location /cockpit/socket {
+        # WebSocket headers
+        proxy_http_version 1.1;
+        proxy_set_header Upgrade $http_upgrade;
+        proxy_set_header Connection "Upgrade";
+
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+        proxy_set_header X-Forwarded-Uri $request_uri;
+        proxy_set_header Authorization $http_authorization;
+
+        proxy_read_timeout 3600s;
+        proxy_send_timeout 3600s;
+        keepalive_timeout 3600s;
+
+        proxy_pass http://127.0.0.1:9090/cockpit/socket;
+    }
+
+    location / {
+        # Require OAuth authentication
+        auth_request /oauth2/auth;
+        auth_request_set $auth_status $upstream_status;
+
+        error_page 401 =403 https://$host/oauth2/sign_in?rd=https://$host$request_uri;
+
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+        proxy_set_header X-Forwarded-Uri $request_uri;
+        proxy_set_header Authorization $http_authorization;
+
+        proxy_pass http://127.0.0.1:9090/;
+    }
+
+    # Ensure this is only used internally
+    location /oauth2/auth {
+        internal;
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+        proxy_set_header X-Forwarded-Uri $request_uri;
+
+        proxy_pass http://127.0.0.1:4180/oauth2/auth;
+    }
+}

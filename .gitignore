@@ -1,0 +1,11 @@
+.notes
+.venv
+*logs/**
+*.session**
+src/.env
+__pycache__
+*.lock
+out/
+*configs/*.json
+*testcase**
+tests/**

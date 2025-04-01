@@ -1,0 +1,17 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+{% include "meta.html.template" ignore missing with context %}
+    <style>
+        .copyright {
+            color: #fff;
+            text-decoration: none;
+            font-size: 12px;
+        }
+
+    </style>
+</head>
+<body>
+Hello world, {{ host_url }}!
+</body>
+</html>

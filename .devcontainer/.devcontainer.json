@@ -1,0 +1,7 @@
+{
+  "name": "Python Dev Container with venv",
+  "build": {
+    "dockerfile": "Dockerfile",
+    "context": ".."
+  },
+}
